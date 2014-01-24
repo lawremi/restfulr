@@ -1,0 +1,26 @@
+Package: restfulr
+Type: Package
+Title: Simple R interface to RESTful web services
+Version: 0.0.0
+Author: Michael Lawrence
+Maintainer: Michael Lawrence <michafla@gene.com>
+Description: Models a RESTful service as if it were a nested R list.
+License: file GNE_LICENSE
+Imports:
+    XML,
+    RCurl,
+    rjson,
+    methods
+Depends:
+    methods
+Collate:
+    CRUDProtocol-class.R
+    CacheInfo-class.R
+    HTTP-class.R
+    Media-class.R
+    MediaCache-class.R
+    RestUri-class.R
+    RestContainer-class.R
+    test_restfulr_package.R
+    utils.R
+    

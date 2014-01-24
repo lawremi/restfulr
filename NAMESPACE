@@ -1,0 +1,10 @@
+useDynLib(restfulr, .registration = TRUE)
+
+import(methods)
+importFrom(RCurl, getURLContent, base64, curlOptions, postForm)
+importFrom(utils, URLencode)
+importFrom(XML, xmlTreeParse, parseURI)
+importFrom(rjson, fromJSON, toJSON)
+
+export(RestUri, container, "container<-", HTTP, acceptedMediaTypes,
+       create, read, update, delete, purgeCache)
