@@ -42,20 +42,26 @@ HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
                       Authorization = authorization(.self),
                       Accept = accept(.self),
                       ...)
-  response <- try(getURLContent(x, header = TRUE, httpheader = request.header),
-                  silent = TRUE)
+  ## We use our own reader so that we can return the body in case of error
+  curl <- getCurlHandle(httpheader = request.header)
+  reader <- dynCurlReader(curl)
+  content <- try(getURLContent(x, header = reader, curl = curl), silent=TRUE)
+  response <- list(header = parseHTTPHeader(reader$header()),
+                   body = reader$value())
   ## Whether the resource does not exist (404) or exists but is NULL (204),
   ## we return NULL, in-line with the behavior of R lists.
-  if (is(response, "try-error")) {
-    if (grepl("Not Found", response)) {
+  if (is(content, "try-error")) {
+    if (grepl("Not Found", content)) {
       response <- NULL
     } else {
-      stop("HTTP response: ", response)
+      stop(structure(attr(content, "condition"),
+                     body=responseToMedia(response)))
     }
-  } else if (as.integer(response$header["status"]) == HTTP_STATUS$No_Content) {
-    response <- NULL
   }
   status <- as.integer(response$header["status"])
+  if (identical(status, HTTP_STATUS$No_Content)) {
+    response <- NULL
+  }
   if (identical(status, HTTP_STATUS$Not_Modified)) {
     cacheInfoFromHeader(response$header, cache.info)
   } else {
@@ -82,22 +88,28 @@ acceptedMediaTypes <- function() {
 }
 
 responseToMedia <- function(x) {
-  if (is.null(x))
-    return(new("NullMedia", cacheInfo=cacheInfoFromHeader(x$header)))
   content.type <- head(attr(x$body, "Content-Type"), 1)
   content.params <- tail(attr(x$body, "Content-Type"), -1)
   media.class <- mediaClassFromContentType(content.type)
   content.params <-
     content.params[intersect(names(content.params), slotNames(media.class))]
-  do.call(new, c(media.class, x$body,
-                 cacheInfo = cacheInfoFromHeader(x$header),
-                 content.params))
+  if (media.class == "NullMedia") {
+    new("NullMedia", cacheInfo = cacheInfoFromHeader(x$header))
+  } else {
+    do.call(new, c(media.class, x$body,
+                   cacheInfo = cacheInfoFromHeader(x$header),
+                   content.params))
+  }
 }
 
 mediaClassFromContentType <- function(x) {
-  if (isClass(x))
-    x
-  else sub("/.*", "/*", x)
+  if (is.null(x))
+    "NullMedia"
+  else if (is.character(x)) {
+    if (isClass(x))
+      x
+    else sub("/.*", "/*", x)
+  } else stop("content type should be character or NULL")
 }
 
 headerFromCacheInfo <- function(x) {

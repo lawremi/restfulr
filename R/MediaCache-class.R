@@ -39,4 +39,5 @@ setMethod("assign", "MediaCache",
 
 purge <- function(x) {
   rm(list=ls(x), envir=x)
+  x
 }

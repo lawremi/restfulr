@@ -47,6 +47,8 @@ setReplaceMethod("cacheInfo", c("Media", "CacheInfo"), function(x, value) {
 
 setMethod("expired", "Media", function(x) expired(cacheInfo(x)))
 
+setMethod("length", "NullMedia", function(x) 0L)
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Coercion
 ###
@@ -61,7 +63,7 @@ setMethod("mediaTarget", "text/*", function(x) "character")
 setMethod("mediaTarget", "NullMedia", function(x) "NULL")
 
 setAs("application/xml", "XMLAbstractNode", function(from) {
-  xmlTreeParse(from, asText=TRUE)
+  xmlInternalTreeParse(from, asText=TRUE)
 })
 
 setAs("application/json", "list", function(from) {
@@ -69,7 +71,15 @@ setAs("application/json", "list", function(from) {
 })
 
 setAs("text/csv", "data.frame", function(from) {
-  read.csv(from)
+  chr <- as.character(from)
+  if (identical(chr, "") || identical(chr, "\n")) {
+    return(data.frame())
+  }
+  con <- file()
+  on.exit(close(con))
+  writeLines(chr, con)
+### FIXME: we are assuming a header, but there is no guarantee
+  read.csv(con, check.names=FALSE, stringsAsFactors=FALSE)
 })
 
 setAs("ANY", "Media", function(from) {
@@ -88,13 +98,13 @@ setAs("data.frame", "Media", function(from) {
 setAs("data.frame", "text/csv", function(from) {
   con <- file()
   on.exit(close(con))
-  write.csv(from, con, row.names=FALSE, qmethod="double")
-  paste(readLines(con), collapse="\n")
+  write.csv(as(from, "data.frame"), con, row.names=FALSE)
+  new("text/csv", paste(readLines(con), collapse="\n"))
 })
 
 contentType <- function(x) {
-  params <- as.character(sapply(setdiff(slotNames(x), ".Data"), slot, object=x,
-                                simplify=FALSE))
+  slots <- setdiff(slotNames(class(x)), c(".Data", "cacheInfo"))
+  params <- vapply(slots, function(nm) as.character(slot(x, nm)), character(1L))
   paste(c(class(x), paste(names(params), params, sep="=")), collapse=";")
 }
 

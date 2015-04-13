@@ -21,9 +21,9 @@ recycleVector <- function(x, length.out)
   }
 }
 
-raggedListToDF <- function(x) {
+raggedListToDF <- function(x, ...) {
   nms <- unlist(lapply(x, names))
   uniq.nms <- unique(nms)
   ind <- match(nms, uniq.nms)
-  as.data.frame(.Call(R_raggedListToDF, x, uniq.nms, ind))
+  as.data.frame(.Call(R_raggedListToDF, x, uniq.nms, ind), ...)
 }

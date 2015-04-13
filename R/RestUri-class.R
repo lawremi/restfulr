@@ -137,6 +137,7 @@ setGeneric("purgeCache", function(x, ...) standardGeneric("purgeCache"))
 
 setMethod("purgeCache", "RestUri", function(x) {
   purge(x@cache)
+  x
 })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
