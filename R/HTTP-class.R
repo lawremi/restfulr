@@ -28,7 +28,7 @@ HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
 .HTTP$methods(create = function(x, value, ...) {
   opts <- curlOptions(postfields = paste(value, collapse="\n"),
                       httpheader = c(
-                        accept(.self),
+                        Accept = accept(.self),
                         'Content-Type' = contentType(value),
                         Authorization = authorization(.self),
                         ...))
@@ -169,7 +169,7 @@ authorization <- function(x) {
 }
 
 accept <- function(x) {
-  setNames(x$accept, rep("Accept", length(x$accept)))
+  paste(x$accept, collapse=", ")
 }
 
 stopIfHTTPError <- function(header) {
