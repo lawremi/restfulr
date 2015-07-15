@@ -94,11 +94,18 @@ setAs("data.frame", "Media", function(from) {
   as(from, "text/csv")
 })
 
-### TODO: support list columns by unstrsplit(x, ",")
 setAs("data.frame", "text/csv", function(from) {
   con <- file()
   on.exit(close(con))
-  write.csv(as(from, "data.frame"), con, row.names=FALSE)
+  df <- as(from, "data.frame")
+  df[] <- lapply(df, function(x) {
+                     if (is.list(x)) {
+                         unstrsplit(x, ",")
+                     } else {
+                         x
+                     }
+                 })
+  write.csv(df, con, row.names=FALSE)
   new("text/csv", paste(readLines(con), collapse="\n"))
 })
 
