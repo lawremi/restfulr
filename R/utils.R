@@ -27,3 +27,10 @@ raggedListToDF <- function(x, ...) {
   ind <- match(nms, uniq.nms)
   as.data.frame(.Call(R_raggedListToDF, x, uniq.nms, ind), ...)
 }
+
+unstrsplit <- function(x, sep = "") {
+    if (!isSingleString(sep)) {
+        stop("'sep' must be a single, non-NA string")
+    }
+    .Call(R_unstrsplit_list, as.list(x), sep)
+}
