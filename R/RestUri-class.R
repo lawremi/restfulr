@@ -61,8 +61,8 @@ setReplaceMethod("[[", "RestUri", function(x, i, j, ..., value) {
 
 query <- function(x, ...) {
   query.params <- c(...)
-  query <- paste(sapply(names(query.params), URLencode),
-                 sapply(as.character(query.params), URLencode),
+  query <- paste(sapply(names(query.params), URLencode, reserved=TRUE),
+                 sapply(as.character(query.params), URLencode, reserved=TRUE),
                  sep = "=", collapse = "&")
   if (nchar(query) > 0L) {
     paste0(x, "?", query)
@@ -105,6 +105,9 @@ setMethod("read", "RestUri", function(x, ...) {
   if (!is.null(cached.media) && !expired(cached.media))
     media <- cached.media
   else {
+    if(isTRUE(getOption("verbose"))) {
+      message("READ: ", URLdecode(uri))
+    }
     result <- x@protocol$read(uri, cacheInfo(cached.media))
     if (is(result, "CacheInfo")) {
       cacheInfo(cached.media) <- result
