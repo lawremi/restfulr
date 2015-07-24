@@ -7,5 +7,12 @@ importFrom(utils, URLencode)
 importFrom(XML, xmlInternalTreeParse, parseURI)
 importFrom(rjson, fromJSON, toJSON)
 
-export(RestUri, container, "container<-", HTTP, acceptedMediaTypes,
-       create, read, update, delete, purgeCache, mediaTarget)
+export(RestUri, container, "container<-", mediaCoercionTable,
+       create, read, update, delete, purgeCache, mediaTarget, RestContainer,
+       MediaCache, globalRestClientCache)
+
+exportClasses(Media, "application/*", "audio/*", "image/*", "message/*",
+              "model/*", "multipart/*", "text/*", "video/*",
+              "text/plain", "text/html", "text/csv", "application/xml",
+              "application/json", RestUri, RestContainer, CRUDProtocol,
+              MediaCache)

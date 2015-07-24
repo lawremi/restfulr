@@ -81,7 +81,8 @@ setMethod("container", "RestUri", function(x) {
   new("RestContainer", uri=x)
 })
 
-setGeneric("container<-", function(x, ..., value) standardGeneric("container<-"))
+setGeneric("container<-",
+           function(x, ..., value) standardGeneric("container<-"))
 
 setReplaceMethod("container", "RestUri", function(x, value) {
   x

@@ -81,10 +81,20 @@ HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
 ### Helpers
 ###
 
+coercionTable <- function() {
+    signatures <- names(getMethods(coerce, table = TRUE))
+    matrix(unlist(strsplit(signatures, "#")), ncol=2L, byrow=TRUE,
+           dimnames=list(NULL, c("from", "to")))
+}
+
+mediaCoercionTable <- function() {
+    tab <- coercionTable()
+    classes <- names(getClass("Media")@subclasses)
+    tab[rowSums(matrix(tab %in% classes, ncol=2L)) > 0L,]
+}
+
 acceptedMediaTypes <- function() {
-  classes <- names(getClass("Media")@subclasses)
-  from <- sub("#.*", "", ls(getMethods(coerce, table = TRUE)))
-  intersect(classes, from)
+    mediaCoercionTable()[,"from"]
 }
 
 responseToMedia <- function(x) {

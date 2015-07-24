@@ -8,6 +8,14 @@
 setClass("RestContainer", representation(uri="RestUri"))
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Constructor
+###
+
+RestContainer <- function(...) {
+    container(RestUri(...))
+}
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### CREATE
 ###
 
