@@ -10,7 +10,7 @@ Imports:
     XML,
     RCurl,
     rjson,
-    S4Vectors
+    S4Vectors (>=0.7.18)
 Depends:
     methods
 Collate:
