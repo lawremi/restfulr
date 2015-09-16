@@ -9,7 +9,8 @@ License: file GNE_LICENSE
 Imports:
     XML,
     RCurl,
-    rjson
+    rjson,
+    S4Vectors
 Depends:
     methods
 Collate:

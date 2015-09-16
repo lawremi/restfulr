@@ -34,7 +34,7 @@ setMethod("[<-", "RestContainer", function(x, i, j, ..., value) {
   if (missing(i)) {
     create(x@uri, value, ...)
   } else {
-    value <- recycleVector(value, length(i))
+    value <- recycleArg(value, "value", length(i))
     for (ii in i)
       x[[ii, ...]] <- value[[ii]]
   }

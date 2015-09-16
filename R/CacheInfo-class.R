@@ -2,8 +2,6 @@
 ### CacheInfo class
 ### -------------------------------------------------------------------------
 
-setClassUnion("characterORNULL", c("character", "NULL"))
-
 setClass("CacheInfo",
          representation(expires = "POSIXt",
                         lastModified = "POSIXt",
