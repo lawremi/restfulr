@@ -98,6 +98,9 @@ setMethod("create", "RestUri", function(x, value, ...) {
   x@protocol$create(query(x, ...), as(value, "Media", strict=FALSE))
   invisible(x)
 })
+setMethod("create", "character", function(x, ...) {
+              create(RestUri(x), ...)
+          })
 
 setGeneric("read", function(x, ...) standardGeneric("read"))
 setMethod("read", "RestUri", function(x, ...) {
@@ -120,18 +123,27 @@ setMethod("read", "RestUri", function(x, ...) {
   }
   as(media, mediaTarget(media))
 })
+setMethod("read", "character", function(x, ...) {
+              read(RestUri(x), ...)
+          })
 
 setMethod("update", "RestUri", function(object, value, ...) {
   uri <- query(x, ...)
   x@protocol$update(uri, value = as(value, "Media"))
   invisible(x)
 })
+setMethod("update", "character", function(object, value, ...) {
+              update(RestUri(object), value, ...)
+          })
 
 setGeneric("delete", function(x, ...) standardGeneric("delete"))
 setMethod("delete", "RestUri", function(x, ...) {
   uri <- query(x, ...)
   x@protocol$delete(uri)
 })
+setMethod("delete", "character", function(x, ...) {
+              delete(RestUri(x), ...)
+          })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Caching
