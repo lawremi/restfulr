@@ -17,6 +17,4 @@ test_RestContainer_CRUD <- function() {
 
   null <- cont$sqlwork
   checkIdentical(null, NULL)
-
-  solr$kill()
 }

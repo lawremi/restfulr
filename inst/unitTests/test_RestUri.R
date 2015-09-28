@@ -32,6 +32,4 @@ test_RestUri_CRUD <- function() {
 
   null <- read(uri$sqlwork)
   checkIdentical(null, NULL)
-
-  solr$kill()
 }
