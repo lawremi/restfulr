@@ -13,6 +13,10 @@
 \alias{update,RestUri-method}
 \alias{delete}
 \alias{delete,RestUri-method}
+\alias{create,character-method}
+\alias{read,character-method}
+\alias{update,character-method}
+\alias{delete,character-method}
 
 % Construction:
 \alias{RestUri}
@@ -47,7 +51,8 @@
   read, update, delete (CRUD). The CRUD model was borrowed from
   traditional databases. The restfulr package maps those four operations
   to R functions of the same name. The functions are generic, and there
-  are methods for \code{RestUri}, described below.
+  are methods for \code{RestUri} and \code{character} (taken to be a
+  URI), described below.
 
   \describe{
     \item{}{
