@@ -128,9 +128,9 @@ setMethod("read", "character", function(x, ...) {
           })
 
 setMethod("update", "RestUri", function(object, value, ...) {
-  uri <- query(x, ...)
-  x@protocol$update(uri, value = as(value, "Media"))
-  invisible(x)
+  uri <- query(object, ...)
+  object@protocol$update(uri, value = as(value, "Media"))
+  invisible(object)
 })
 setMethod("update", "character", function(object, value, ...) {
               update(RestUri(object), value, ...)
