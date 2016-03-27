@@ -1,7 +1,7 @@
 Package: restfulr
 Type: Package
 Title: Simple R interface to RESTful web services
-Version: 0.0.2
+Version: 0.0.3
 Author: Michael Lawrence
 Maintainer: Michael Lawrence <michafla@gene.com>
 Description: Models a RESTful service as if it were a nested R list.
