@@ -4,10 +4,15 @@
 ##
 ## A URI constructor with a $/[[-based syntax for path concatenation.
 ##
+## Could be called more specifically a URL, since it can get the data.
+##
+
+setClassUnion("CredentialsORNULL", c("Credentials", "NULL"))
 
 setClass("RestUri",
          representation(cache = "MediaCache",
-                        protocol = "CRUDProtocol"),
+                        protocol = "CRUDProtocol",
+                        credentials = "CredentialsORNULL"),
          contains = "character")
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -30,6 +35,14 @@ RestUri <- function(base.uri, protocol = CRUDProtocol(base.uri, ...),
   base.uri <- sub("/$", "", base.uri)
   new("RestUri", base.uri, protocol = protocol, cache = cache)
 }
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Accessors
+###
+
+setGeneric("credentials", function(x, ...) standardGeneric("credentials"))
+
+setMethod("credentials", "RestUri", function(x) x@credentials)
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### URI building methods
@@ -65,7 +78,7 @@ query <- function(x, ...) {
                  sapply(as.character(query.params), URLencode, reserved=TRUE),
                  sep = "=", collapse = "&")
   if (nchar(query) > 0L) {
-    paste0(x, "?", query)
+    initialize(x, paste0(x, "?", query))
   } else {
     x
   }
@@ -93,26 +106,44 @@ setReplaceMethod("container", "RestUri", function(x, value) {
 ### Transactions
 ###
 
+write <- function(FUN, url, value, returnResponse=FALSE, ...) {
+    stopifnot(isTRUEorFALSE(returnResponse))
+    url <- query(url, ...)
+    media <- as(value, "Media", strict=FALSE)
+    media <- tryCatch(FUN(url, media),
+                      unauthorized = function(cond) {
+                          url <- authenticate(url)
+                          FUN(url, media)
+                      })
+    if (returnResponse)
+        as(media, mediaTarget(media))
+    else invisible(url)    
+}
+
 setGeneric("create", function(x, ...) standardGeneric("create"))
-setMethod("create", "RestUri", function(x, value, ...) {
-  x@protocol$create(query(x, ...), as(value, "Media", strict=FALSE))
-  invisible(x)
-})
+setMethod("create", "RestUri", function(x, value, returnResponse=FALSE, ...) {
+              write(x@protocol$create, x, value, returnResponse, ...)
+          })
 setMethod("create", "character", function(x, ...) {
               create(RestUri(x), ...)
           })
 
 setGeneric("read", function(x, ...) standardGeneric("read"))
 setMethod("read", "RestUri", function(x, ...) {
-  uri <- query(x, ...)
-  cached.media <- x@cache[[uri]]
+  x <- query(x, ...)
+  cached.media <- x@cache[[x]]
   if (!is.null(cached.media) && !expired(cached.media))
     media <- cached.media
   else {
     if(isTRUE(getOption("verbose"))) {
       message("READ: ", URLdecode(uri))
     }
-    result <- x@protocol$read(uri, cacheInfo(cached.media))
+    cacheInfo <- cacheInfo(cached.media)
+    result <- tryCatch(x@protocol$read(x, cacheInfo),
+                       unauthorized = function(cond) {
+                           x <- authenticate(x)
+                           x@protocol$read(x, cacheInfo)
+                       })
     if (is(result, "CacheInfo")) {
       cacheInfo(cached.media) <- result
       media <- cached.media
@@ -128,21 +159,99 @@ setMethod("read", "character", function(x, ...) {
           })
 
 setMethod("update", "RestUri", function(object, value, ...) {
-  uri <- query(object, ...)
-  object@protocol$update(uri, value = as(value, "Media"))
-  invisible(object)
-})
+              write(object@protocol$update, object, value, ...)
+          })
 setMethod("update", "character", function(object, value, ...) {
               update(RestUri(object), value, ...)
           })
 
 setGeneric("delete", function(x, ...) standardGeneric("delete"))
 setMethod("delete", "RestUri", function(x, ...) {
-  uri <- query(x, ...)
-  x@protocol$delete(uri)
-})
+              x <- query(x, ...)
+              invisible(tryCatch(x@protocol$delete(x),
+                                 unauthorized = function(cond) {
+                                     x <- authenticate(x)
+                                     x@protocol$delete(x)
+                                 }))
+          })
 setMethod("delete", "character", function(x, ...) {
               delete(RestUri(x), ...)
+          })
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Authentication
+###
+
+configPath <- function(...) {
+    base <- path.expand(file.path(Sys.getenv("XDG_CONFIG_HOME",
+                                             "~/.local/config"),
+                                  "restfulr"))
+    file.path(base, ...)
+}
+
+loadCredentials <- function() {
+    path <- configPath("credentials.yaml")
+    if (file.exists(path)) {
+        yaml.load_file(path)
+    } else {
+        list()
+    }
+}
+
+findCredentials <- function(uri) {
+    config <- loadCredentials()
+    prefix <- substring(uri, 1L, nchar(names(config)))
+    hits <- which(prefix == names(config))
+    if (length(hits) > 0L)
+        config[[hits[1L]]]
+}
+
+saveCredentials <- function(x, uri) {
+    config <- loadConfig()
+    config[[uri]] <- x
+    writeLines(as.yaml(config), configPath("credentials.yaml"))
+}
+
+promptForCredentials <- function() {
+    defaultUser <- Sys.info()["effective_user"]
+    username <- readline(paste0("username (default: ",
+                                defaultUser, "): "))
+    if (username == "")
+        username <- defaultUser
+    inTerminal <- .Platform$GUI == "X11" && !identical(Sys.getenv("EMACS"), "t")
+    if (inTerminal) {
+        system("stty -echo")
+        on.exit(system("stty echo"))
+    } else {
+        warning("THIS WILL SHOW YOUR PASSWORD")
+    }
+    password <- readline("password: ")
+    if (password != "")
+        list(username=username, password=password)
+}
+
+unauthorized <- function() {
+    error <- simpleError("unauthorized")
+    class(error) <- c("unauthorized", class(error))
+    stop(error)
+}
+
+setGeneric("authenticate", function(x, ...) standardGeneric("authenticate"))
+
+setMethod("authenticate", "RestUri", function(x) {
+              credentials <- findCredentials(x)
+              if (is.null(credentials)) {
+                  credentials <- promptForCredentials()
+                  if (is.null(credentials)) {
+                      stop("authentication failed: see ?credentials")
+                  }
+                  if (getOption("restfulr.store.credentials", TRUE)) {
+                      saveCredentials(credentials, x)
+                  }
+              }
+              initialize(x,
+                         credentials=Credentials(credentials$username,
+                             credentials$password))
           })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

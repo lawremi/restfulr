@@ -30,6 +30,5 @@ test_RestUri_CRUD <- function() {
   doc <- read(uri$select, q=paste0("id:", id), wt="json")
   checkIdentical(doc$response$docs[[1]][1:2], input)
 
-  null <- read(uri$sqlwork)
-  checkIdentical(null, NULL)
+  checkException(read(uri$sqlwork)) # 404
 }

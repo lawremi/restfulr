@@ -10,12 +10,14 @@ Imports:
     XML,
     RCurl,
     rjson,
-    S4Vectors (>= 0.7.18)
+    S4Vectors (>= 0.7.18),
+    yaml
 Depends:
     methods
 Collate:
     CRUDProtocol-class.R
     CacheInfo-class.R
+    Credentials-class.R
     HTTP-class.R
     Media-class.R
     MediaCache-class.R

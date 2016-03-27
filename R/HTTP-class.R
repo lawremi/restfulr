@@ -4,7 +4,6 @@
 
 .HTTP <- setRefClass("HTTP",
                      fields = list(
-                       userpwd = "characterORNULL",
                        accept = "character"
                        ),
                      contains = "CRUDProtocol")
@@ -13,12 +12,10 @@
 ### Constructor
 ###
 
-HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
-  if (!is.null(userpwd) && !isSingleString(userpwd))
-    stop("if not NULL, 'userpwd' must be a single, non-NA string")
+HTTP <- function(accept = acceptedMediaTypes()) {
   if (!is.character(accept) || any(is.na(accept)))
     stop("'accept' must be a character() without NAs")
-  .HTTP$new(userpwd = userpwd, accept = accept)
+  .HTTP$new(accept = accept)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,47 +23,31 @@ HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
 ###
 
 .HTTP$methods(create = function(x, value, ...) {
+  curl <- getCurlHandle()
+  reader <- dynCurlReader(curl)
   opts <- curlOptions(postfields = paste(value, collapse="\n"),
                       httpheader = c(
                         Accept = accept(.self),
                         'Content-Type' = contentType(value),
-                        Authorization = authorization(.self),
-                        ...))
-  invisible(postForm(x, .opts=opts))
+                        Authorization = authorization(x),
+                          ...),
+                      headerfunction = reader$update)
+  content <- try(postForm(x, .opts=opts, curl=curl), silent=TRUE)
+  invisible(handleResponse(content, reader))
 })
 
 .HTTP$methods(read = function(x, cache.info, ...) {
   if (!isSingleString(x))
     stop("'x' must be a single, non-NA string representing a URL")
   request.header <- c(headerFromCacheInfo(cache.info),
-                      Authorization = authorization(.self),
+                      Authorization = authorization(x),
                       Accept = accept(.self),
                       ...)
   ## We use our own reader so that we can return the body in case of error
   curl <- getCurlHandle(httpheader = request.header)
   reader <- dynCurlReader(curl)
   content <- try(getURLContent(x, header = reader, curl = curl), silent=TRUE)
-  response <- list(header = parseHTTPHeader(reader$header()),
-                   body = reader$value())
-  ## Whether the resource does not exist (404) or exists but is NULL (204),
-  ## we return NULL, in-line with the behavior of R lists.
-  if (is(content, "try-error")) {
-    if (grepl("Not Found", content)) {
-      response <- NULL
-    } else {
-      stop(structure(attr(content, "condition"),
-                     body=responseToMedia(response)))
-    }
-  }
-  status <- as.integer(response$header["status"])
-  if (identical(status, HTTP_STATUS$No_Content)) {
-    response <- NULL
-  }
-  if (identical(status, HTTP_STATUS$Not_Modified)) {
-    cacheInfoFromHeader(response$header, cache.info)
-  } else {
-    responseToMedia(response)
-  }
+  handleResponse(content, reader, cache.info)
 })
 
 .HTTP$methods(update = function(x, ..., value) {
@@ -80,6 +61,27 @@ HTTP <- function(userpwd = NULL, accept = acceptedMediaTypes()) {
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Helpers
 ###
+
+handleResponse <- function(content, reader, cache.info = NULL) {
+    response <- list(header = parseHTTPHeader(reader$header()),
+                     body = reader$value())
+    if (is(content, "try-error")) {
+        stop(structure(attr(content, "condition"),
+                       body=responseToMedia(response)))
+    }
+    status <- as.integer(response$header["status"])
+    if (identical(status, HTTP_STATUS$Unauthorized)) {
+        unauthorized()
+    }
+    if (identical(status, HTTP_STATUS$No_Content)) {
+        response <- NULL
+    }
+    if (!is.null(cache.info) && identical(status, HTTP_STATUS$Not_Modified)) {
+        cacheInfoFromHeader(response$header, cache.info)
+    } else {
+        responseToMedia(response)
+    }
+}
 
 coercionTable <- function() {
     signatures <- names(getMethods(coerce, table = TRUE))
@@ -173,9 +175,11 @@ parseHTTPDate <- function(x) {
 }
 
 authorization <- function(x) {
-  if (is.null(x$userpwd))
-    NULL
-  else paste("Basic", base64(x$userpwd))
+    credentials <- credentials(x)
+    if (!is.null(credentials)) {
+        auth <- paste0(username(credentials), ":", password(credentials))
+        paste("Basic", base64(auth))
+    }
 }
 
 accept <- function(x) {

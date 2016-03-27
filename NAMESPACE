@@ -7,14 +7,19 @@ importFrom(utils, URLencode)
 importFrom(XML, xmlInternalTreeParse, parseURI)
 importFrom(rjson, fromJSON, toJSON)
 importFrom(S4Vectors, isSingleString, isTRUEorFALSE, recycleArg, unstrsplit)
+importFrom(yaml, as.yaml, yaml.load_file)
 importClassesFrom(S4Vectors, characterORNULL)
 
-export(RestUri, container, "container<-", mediaCoercionTable,
-       create, read, update, delete, purgeCache, mediaTarget, RestContainer,
+export(RestUri, mediaCoercionTable, RestContainer,
        MediaCache, globalRestClientCache)
+
+exportMethods(create, read, update, delete, purgeCache, mediaTarget,
+              container, "container<-", credentials, username, password)
 
 exportClasses(Media, "application/*", "audio/*", "image/*", "message/*",
               "model/*", "multipart/*", "text/*", "video/*",
               "text/plain", "text/html", "text/csv", "application/xml",
               "application/json", RestUri, RestContainer, CRUDProtocol,
               MediaCache)
+
+S3method(as.list, Media)
