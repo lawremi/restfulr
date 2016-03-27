@@ -29,6 +29,9 @@ setClass("application/json",
          contains = c("character", "application/*"))
 ##setClass("application/R", contains = "application/*")
 
+setClass("application/x-www-form-urlencoded",
+         contains = c("character", "application/*"))
+
 setClass("NullMedia", contains = "Media")
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
