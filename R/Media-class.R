@@ -73,17 +73,25 @@ setAs("application/json", "list", function(from) {
   fromJSON(from)
 })
 
-setAs("text/csv", "data.frame", function(from) {
-  chr <- as.character(from)
-  if (identical(chr, "") || identical(chr, "\n")) {
-    return(data.frame())
-  }
-  con <- file()
-  on.exit(close(con))
-  writeLines(chr, con)
+`as.data.frame.text/csv` <- function(x, row.names = NULL, optional = FALSE, ...)
+{
+    chr <- as.character(from)
+    if (identical(chr, "") || identical(chr, "\n")) {
+        return(data.frame())
+    }
+    con <- file()
+    on.exit(close(con))
+    writeLines(chr, con)
 ### FIXME: we are assuming a header, but there is no guarantee
-  read.csv(con, check.names=FALSE, stringsAsFactors=FALSE)
-})
+    df <- read.csv(con, check.names=!optional, stringsAsFactors=FALSE, ...)
+    if (!is.null(row.names))
+        rownames(df) <- row.names
+    df
+}
+
+setAs("text/csv", "data.frame", function(from) {
+          as.data.frame(from, optional=TRUE)
+      })
 
 setAs("ANY", "Media", function(from) {
   as(from, "application/json")
