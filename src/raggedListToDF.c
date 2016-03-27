@@ -12,6 +12,9 @@ SEXP R_raggedListToDF(SEXP x, SEXP uniq_nms, SEXP ind) {
     for (int j = 0; j < length(xi); j++, p_ind++) {
       int col = *p_ind - 1;
       SEXP xij = VECTOR_ELT(xi, j);
+      if (xij == R_NilValue) {
+          continue;
+      }
       /* FIXME: should determine whether any length(xij) > 1 and use list */
       SEXP ansj = VECTOR_ELT(ans, col);
       if (ansj == R_NilValue) {
