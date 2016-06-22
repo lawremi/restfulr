@@ -23,6 +23,8 @@ HTTP <- function(accept = acceptedMediaTypes()) {
 ###
 
 .HTTP$methods(create = function(x, value, ...) {
+  if (!isSingleString(x))
+    stop("'x' must be a single, non-NA string representing a URL")
   curl <- getCurlHandle()
   reader <- dynCurlReader(curl)
   opts <- curlOptions(postfields = paste(value, collapse="\n"),
@@ -92,11 +94,12 @@ coercionTable <- function() {
 mediaCoercionTable <- function() {
     tab <- coercionTable()
     classes <- names(getClass("Media")@subclasses)
-    tab[rowSums(matrix(tab %in% classes, ncol=2L)) > 0L,]
+    tab[rowSums(matrix(tab %in% classes, ncol=2L)) == 1L,]
 }
 
 acceptedMediaTypes <- function() {
-    mediaCoercionTable()[,"from"]
+    intersect(mediaCoercionTable()[,"from"],
+              names(getClass("Media")@subclasses))
 }
 
 responseToMedia <- function(x) {
