@@ -34,6 +34,13 @@
 % Utilities
 \alias{purgeCache}
 \alias{purgeCache,RestUri-method}
+\alias{download.file}
+\alias{download.file,RestUri-method}
+
+% Authentication:
+\alias{authenticate}
+\alias{authenticate,RestUri-method}
+\alias{credentials,RestUri-method}
 
 % Show:
 \alias{show,RestUri-method}
@@ -106,6 +113,33 @@
     \item{}{
       \code{container(x)}: Gets a \code{\linkS4class{RestContainer}}
       object for treating \code{x} as a list-like container.
+    }
+  }
+}
+
+\section{Authentication}{
+  RestUri currently supports basic HTTP authentication. Call
+  \code{authenticate(x)} to add credentials to the RestUri
+  \code{x}. Retrieve the Credentials object with the \code{credentials}
+  accessor.
+
+  Once a set of credentials has been entered, it is recorded for the URI
+  in \file{$(HOME)/.local/config/restfulr/credentials.yaml}. The path
+  prefix can be changed via the \env{XDG_CONFIG_DIR} environment
+  variable, according to the \acronym{XDG} standard. The credential
+  cache is checked during authentication, so that a user does not need
+  to reenter credentials for the same URI.
+
+  If the \pkg{getPass} package is installed, we use it
+  for password entry. Otherwise, we rely on an implementation that
+  shows the password as it is entered, unless the user is in a terminal,
+  where we can hide input.
+}
+
+\section{Utilities}{
+  \describe{
+    \item{}{\code{download.file(url, ...)}: Download the file from
+      \code{url}, a RestUri object. Uses \link{credentials} if available.
     }
   }
 }

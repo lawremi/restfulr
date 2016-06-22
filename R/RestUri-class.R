@@ -33,7 +33,9 @@ RestUri <- function(base.uri, protocol = CRUDProtocol(base.uri, ...),
   if (!missing(protocol) && length(list(...)) > 0L)
     warning("arguments in '...' are ignored when 'protocol' is non-missing")
   base.uri <- sub("/$", "", base.uri)
-  new("RestUri", base.uri, protocol = protocol, cache = cache)
+  credentials <- findCredentials(base.uri)
+  new("RestUri", base.uri, protocol = protocol, cache = cache,
+      credentials = credentials)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -202,14 +204,27 @@ findCredentials <- function(uri) {
     config <- loadCredentials()
     prefix <- substring(uri, 1L, nchar(names(config)))
     hits <- which(prefix == names(config))
-    if (length(hits) > 0L)
-        config[[hits[1L]]]
+    if (length(hits) > 0L) {
+        userpwd <- config[[hits[1L]]]
+        Credentials(userpwd$username, userpwd$password)
+    }
 }
 
 saveCredentials <- function(x, uri) {
-    config <- loadConfig()
-    config[[uri]] <- x
+    config <- loadCredentials()
+    config[[uri]] <- as.list(x)
     writeLines(as.yaml(config), configPath("credentials.yaml"))
+}
+
+hackyGetPass <- function() {
+    inTerminal <- .Platform$GUI == "X11" && !identical(Sys.getenv("EMACS"), "t")
+    if (inTerminal) {
+        system("stty -echo")
+        on.exit(system("stty echo"))
+    } else {
+        cat("THIS WILL SHOW YOUR PASSWORD\n")
+    }
+    readline("password: ")
 }
 
 promptForCredentials <- function() {
@@ -218,16 +233,13 @@ promptForCredentials <- function() {
                                 defaultUser, "): "))
     if (username == "")
         username <- defaultUser
-    inTerminal <- .Platform$GUI == "X11" && !identical(Sys.getenv("EMACS"), "t")
-    if (inTerminal) {
-        system("stty -echo")
-        on.exit(system("stty echo"))
+    if (requireNamespace("getPass")) {
+        password <- getPass::getPass()
     } else {
-        warning("THIS WILL SHOW YOUR PASSWORD")
+        password <- hackyGetPass()
     }
-    password <- readline("password: ")
-    if (password != "")
-        list(username=username, password=password)
+    if (!is.null(password) && password != "")
+        Credentials(username, password)
 }
 
 unauthorized <- function() {
@@ -249,9 +261,7 @@ setMethod("authenticate", "RestUri", function(x) {
                       saveCredentials(credentials, x)
                   }
               }
-              initialize(x,
-                         credentials=Credentials(credentials$username,
-                             credentials$password))
+              initialize(x, credentials=credentials)
           })
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

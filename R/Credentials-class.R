@@ -33,10 +33,21 @@ Credentials <- function(username, password) {
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Coerce
+###
+
+as.list.Credentials <- function(x) {
+    as.list(x)
+}
+
+setMethod("as.list", "Credentials", function(x)
+    list(username=username(x), password=password(x)))
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Show
 ###
 
 setMethod("show", "Credentials", function(object) {
-              cat("A ", class(object), " object\n")
-              cat("username: ", username(object), "\n")
+              cat("A", class(object), "object\n")
+              cat("username:", username(object), "\n")
           })
