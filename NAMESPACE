@@ -14,7 +14,8 @@ export(RestUri, mediaCoercionTable, RestContainer,
        MediaCache, globalRestClientCache)
 
 exportMethods(create, read, update, delete, purgeCache, mediaTarget,
-              container, "container<-", credentials, username, password)
+              container, "container<-", credentials, username, password,
+              download.file, authenticate)
 
 exportClasses(Media, "application/*", "audio/*", "image/*", "message/*",
               "model/*", "multipart/*", "text/*", "video/*",

@@ -275,6 +275,32 @@ setMethod("purgeCache", "RestUri", function(x) {
   x
 })
 
+setGeneric("download.file",
+           function(url, destfile, method, quiet = FALSE,
+                    mode = "w", cacheOK = TRUE, 
+                    extra = getOption("download.file.extra"))
+               standardGeneric("download.file"),
+           signature="url")
+
+embedCredentials <- function(x) {
+    creds <- credentials(x)
+    if (is.null(creds)) {
+        return(x)
+    }
+    auth <- paste0(URLencode(username(creds), reserved=TRUE), ":",
+                   URLencode(password(creds), reserved=TRUE), "@")
+    url <- sub("://", paste0("://", auth), x, fixed=TRUE)
+    initialize(x, url, credentials=NULL)
+}
+
+setMethod("download.file", "RestUri",
+          function(url, destfile, method, quiet = FALSE,
+                   mode = "w", cacheOK = TRUE, 
+                   extra = getOption("download.file.extra")) {
+              url <- as.character(embedCredentials(url))
+              callGeneric()
+          })
+
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Show
 ###
