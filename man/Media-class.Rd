@@ -39,6 +39,7 @@
 \alias{mediaTarget}
 \alias{mediaTarget,application/json-method}
 \alias{mediaTarget,application/xml-method}
+\alias{mediaTarget,text/html-method}
 \alias{mediaTarget,text/csv-method}
 \alias{mediaTarget,text/*-method}
 \alias{mediaTarget,NullMedia-method}
@@ -69,7 +70,7 @@
 
   The following bi-directional mappings are built into the package:
   \tabular{ll}{
-    \code{application/xml} \tab
+    \code{application/xml}, \code{text/html} \tab
     \code{\link[XML:XMLAbstractNode-class]{XMLAbstractNode}} \cr
     \code{application/json} \tab \code{list} \cr
     \code{text/csv} \tab \code{data.frame} \cr

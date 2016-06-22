@@ -25,6 +25,7 @@ setClass("application/xml",
          representation(charset = "character"),
          prototype(charset = "us-ascii"),
          contains = c("character", "application/*"))
+setClass("application/xhtml+xml", contains="application/xml")
 setClass("application/json",
          contains = c("character", "application/*"))
 ##setClass("application/R", contains = "application/*")
@@ -61,6 +62,7 @@ setGeneric("mediaTarget", function(x, ...) standardGeneric("mediaTarget"))
 
 setMethod("mediaTarget", "application/json", function(x) "list")
 setMethod("mediaTarget", "application/xml", function(x) "XMLAbstractNode")
+setMethod("mediaTarget", "text/html", function(x) "XMLAbstractNode")
 setMethod("mediaTarget", "text/csv", function(x) "data.frame")
 setMethod("mediaTarget", "text/*", function(x) "character")
 setMethod("mediaTarget", "NullMedia", function(x) "NULL")
@@ -69,13 +71,26 @@ setAs("application/xml", "XMLAbstractNode", function(from) {
   xmlInternalTreeParse(from, asText=TRUE)
 })
 
+setAs("text/html", "XMLAbstractNode", function(from) {
+  htmlTreeParse(from, asText=TRUE, useInternalNodes=TRUE)
+})
+
 setAs("application/json", "list", function(from) {
   fromJSON(from)
 })
 
+`as.data.frame.application/json` <- function(x, row.names = NULL,
+                                             optional = FALSE, ...)
+{
+    df <- raggedListToDF(as.list(x), optional=optional, ...)
+    if (!is.null(row.names))
+        rownames(df) <- row.names
+    df
+}
+
 `as.data.frame.text/csv` <- function(x, row.names = NULL, optional = FALSE, ...)
 {
-    chr <- as.character(from)
+    chr <- as.character(x)
     if (identical(chr, "") || identical(chr, "\n")) {
         return(data.frame())
     }
@@ -89,7 +104,7 @@ setAs("application/json", "list", function(from) {
     df
 }
 
-setAs("text/csv", "data.frame", function(from) {
+setAs("Media", "data.frame", function(from) {
           as.data.frame(from, optional=TRUE)
       })
 
