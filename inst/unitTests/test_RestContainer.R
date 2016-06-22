@@ -15,6 +15,5 @@ test_RestContainer_CRUD <- function() {
   doc <- cont[["select", q=paste0("id:", id), wt="json"]]
   checkIdentical(doc$response$docs[[1]][1:2], input)
 
-  null <- cont$sqlwork
-  checkIdentical(null, NULL)
+  checkException(cont$sqlwork)
 }
