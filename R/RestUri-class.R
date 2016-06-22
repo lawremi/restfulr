@@ -138,7 +138,7 @@ setMethod("read", "RestUri", function(x, ...) {
     media <- cached.media
   else {
     if(isTRUE(getOption("verbose"))) {
-      message("READ: ", URLdecode(uri))
+      message("READ: ", URLdecode(x))
     }
     cacheInfo <- cacheInfo(cached.media)
     result <- tryCatch(x@protocol$read(x, cacheInfo),
@@ -152,7 +152,7 @@ setMethod("read", "RestUri", function(x, ...) {
     } else {
       media <- result
     }
-    x@cache[[uri]] <- media
+    x@cache[[x]] <- media
   }
   as(media, mediaTarget(media))
 })

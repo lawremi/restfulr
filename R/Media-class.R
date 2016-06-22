@@ -135,7 +135,7 @@ setAs("data.frame", "text/csv", function(from) {
   new("text/csv", paste(readLines(con), collapse="\n"))
 })
 
-as.list.Media <- function(x) as(x, "list")
+as.list.Media <- function(x, ...) as(x, "list")
 
 contentType <- function(x) {
   slots <- setdiff(slotNames(class(x)), c(".Data", "cacheInfo"))
