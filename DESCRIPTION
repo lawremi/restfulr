@@ -14,6 +14,8 @@ Imports:
     yaml
 Depends:
     methods
+Suggests:
+    getPass
 Collate:
     CRUDProtocol-class.R
     CacheInfo-class.R
