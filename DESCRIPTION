@@ -5,7 +5,7 @@ Version: 0.0.3
 Author: Michael Lawrence
 Maintainer: Michael Lawrence <michafla@gene.com>
 Description: Models a RESTful service as if it were a nested R list.
-License: file GNE_LICENSE
+License: Artistic-2.0
 Imports:
     XML,
     RCurl,
