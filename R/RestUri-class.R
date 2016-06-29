@@ -202,8 +202,7 @@ loadCredentials <- function() {
 
 findCredentials <- function(uri) {
     config <- loadCredentials()
-    prefix <- substring(uri, 1L, nchar(names(config)))
-    hits <- which(prefix == names(config))
+    hits <- which(startsWith(uri, names(config)))
     if (length(hits) > 0L) {
         userpwd <- config[[hits[1L]]]
         Credentials(userpwd$username, userpwd$password)
