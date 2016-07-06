@@ -63,10 +63,12 @@
 
   \describe{
     \item{}{
-      \code{create(x, value, ...)}: Creates a resource at \code{x} by
-      converting \code{value} to a supported media type. The \dots
-      become query parameters on \code{x}. This corresponds to an HTTP
-      \code{POST}.
+      \code{create(x, value, ..., returnResponse=FALSE)}: Creates a
+      resource at \code{x} by converting \code{value} to a supported
+      media type. The \dots become query parameters on \code{x}. If
+      \code{returnResponse} is \code{TRUE}, convert and return any
+      response sent from the endpoint. By default, \code{x} is returned,
+      to support chaining.  This corresponds to an HTTP \code{POST}.
     }
     \item{}{
       \code{read(x, ...)}: Reads the resource at \code{x}, coerces it to

@@ -108,7 +108,7 @@ setReplaceMethod("container", "RestUri", function(x, value) {
 ### Transactions
 ###
 
-write <- function(FUN, url, value, returnResponse=FALSE, ...) {
+write <- function(FUN, url, value, ..., returnResponse=FALSE) {
     stopifnot(isTRUEorFALSE(returnResponse))
     url <- query(url, ...)
     media <- as(value, "Media", strict=FALSE)
@@ -123,9 +123,10 @@ write <- function(FUN, url, value, returnResponse=FALSE, ...) {
 }
 
 setGeneric("create", function(x, ...) standardGeneric("create"))
-setMethod("create", "RestUri", function(x, value, returnResponse=FALSE, ...) {
-              write(x@protocol$create, x, value, returnResponse, ...)
-          })
+setMethod("create", "RestUri", function(x, value, ..., returnResponse=FALSE) {
+    write(x@protocol$create, x, value, ...,
+          returnResponse=returnResponse)
+})
 setMethod("create", "character", function(x, ...) {
               create(RestUri(x), ...)
           })
