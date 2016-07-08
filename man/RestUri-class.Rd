@@ -24,6 +24,7 @@
 \alias{[[,RestUri-method}
 \alias{$<-,RestUri-method}
 \alias{[[<-,RestUri-method}
+\alias{[,RestUri-method}
 
 % Container:
 \alias{container}
@@ -106,6 +107,9 @@
     }
     \item{}{\code{x[[i]]}: Extends the path of \code{x} by appending
       \code{i}.
+    }
+    \item{}{\code{x[...]}: Named arguments in \code{...} become query
+      parameters on \code{x}.
     }
   }
 }

@@ -74,13 +74,23 @@ setReplaceMethod("[[", "RestUri", function(x, i, j, ..., value) {
   x
 })
 
+setMethod("[", "RestUri", function(x, i, j, ...) {
+    params <- c(i=if (!missing(i)) i,
+                j=if (!missing(j)) j,
+                list(...))
+    query(x, params)
+})
+
 query <- function(x, ...) {
   query.params <- c(...)
   query <- paste(sapply(names(query.params), URLencode, reserved=TRUE),
                  sapply(as.character(query.params), URLencode, reserved=TRUE),
                  sep = "=", collapse = "&")
   if (nchar(query) > 0L) {
-    initialize(x, paste0(x, "?", query))
+      uri <- if (grepl("?", x, fixed=TRUE))
+                 paste0(x, "&", query)
+             else paste0(x, "?", query)
+      initialize(x, uri)
   } else {
     x
   }
