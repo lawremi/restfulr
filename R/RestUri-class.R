@@ -223,7 +223,11 @@ findCredentials <- function(uri) {
 saveCredentials <- function(x, uri) {
     config <- loadCredentials()
     config[[uri]] <- as.list(x)
-    writeLines(as.yaml(config), configPath("credentials.yaml"))
+    path <- configPath("credentials.yaml")
+    if (!file.exists(dirname(path))) {
+        dir.create(dirname(path), recursive=TRUE)
+    }
+    writeLines(as.yaml(config), path)
 }
 
 hackyGetPass <- function() {
