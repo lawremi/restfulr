@@ -213,7 +213,7 @@ loadCredentials <- function() {
 
 findCredentials <- function(uri) {
     config <- loadCredentials()
-    hits <- which(startsWith(uri, names(config)))
+    hits <- which(startsWith(uri, as.character(names(config))))
     if (length(hits) > 0L) {
         userpwd <- config[[hits[1L]]]
         Credentials(userpwd$username, userpwd$password)
