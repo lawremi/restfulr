@@ -1,5 +1,9 @@
 .test <- function() {
+    if (!requireNamespace("rsolr")) {
+        stop("rsolr package required for testing")
+    }
     solr <- rsolr::TestSolr()
     on.exit(solr$kill())
-    BiocGenerics:::testPackage("restfulr")
+    testPackage <- get("testPackage", getNamespace("BiocGenerics"))
+    testPackage("restfulr")
 }
