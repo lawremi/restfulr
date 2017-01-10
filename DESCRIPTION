@@ -1,7 +1,7 @@
 Package: restfulr
 Type: Package
-Title: Simple R interface to RESTful web services
-Version: 0.0.5
+Title: R Interface to RESTful Web Services
+Version: 0.0.6
 Author: Michael Lawrence
 Maintainer: Michael Lawrence <michafla@gene.com>
 Description: Models a RESTful service as if it were a nested R list.
@@ -15,7 +15,9 @@ Imports:
 Depends:
     methods
 Suggests:
-    getPass
+    getPass,
+    rsolr,
+    RUnit
 Collate:
     CRUDProtocol-class.R
     CacheInfo-class.R

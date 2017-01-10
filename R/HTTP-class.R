@@ -190,7 +190,8 @@ accept <- function(x) {
 }
 
 stopIfHTTPError <- function(header) {
-  RCurl:::stop.if.HTTP.error(header)
+  stop.if.HTTP.error <- get("stop.if.HTTP.error", getNamespace("RCurl"))
+  stop.if.HTTP.error(header)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
