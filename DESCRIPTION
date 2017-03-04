@@ -1,7 +1,7 @@
 Package: restfulr
 Type: Package
 Title: R Interface to RESTful Web Services
-Version: 0.0.6
+Version: 0.0.9
 Author: Michael Lawrence
 Maintainer: Michael Lawrence <michafla@gene.com>
 Description: Models a RESTful service as if it were a nested R list.
@@ -13,6 +13,7 @@ Imports:
     S4Vectors (>= 0.7.18),
     yaml
 Depends:
+    R (>= 3.3.0),
     methods
 Suggests:
     getPass,
