@@ -5,7 +5,7 @@
 setClass("CacheInfo",
          representation(expires = "POSIXt",
                         lastModified = "POSIXt",
-                        hash = "characterORNULL"))
+                        hash = "character_OR_NULL"))
 
 CacheInfo <- function(expires = Sys.time(),
                       lastModified = as.POSIXct("1960-01-01"),

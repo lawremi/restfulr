@@ -3,8 +3,8 @@
 ### -------------------------------------------------------------------------
 
 setClass("Credentials",
-         representation(username = "characterORNULL",
-                        password = "characterORNULL"),
+         representation(username = "character_OR_NULL",
+                        password = "character_OR_NULL"),
          validity = function(object) {
              c(if (!is.null(object@username) &&
                    !isSingleString(object@username))
