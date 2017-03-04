@@ -1,6 +1,7 @@
 .test <- function() {
     if (!requireNamespace("rsolr")) {
-        stop("rsolr package required for testing")
+        warning("install rsolr to perform tests")
+        return()
     }
     solr <- rsolr::TestSolr()
     on.exit(solr$kill())
