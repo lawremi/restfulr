@@ -7,6 +7,7 @@ SEXP R_raggedListToDF(SEXP x, SEXP uniq_nms, SEXP ind);
 
 static R_CallMethodDef CallEntries[] = {
   CALLDEF(R_raggedListToDF, 3),
+  {NULL, NULL, 0}
 };
 
 
