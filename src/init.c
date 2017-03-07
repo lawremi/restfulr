@@ -15,4 +15,5 @@ void R_init_restfulr(DllInfo *dll)
 {
   // Register C routines
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
 }
