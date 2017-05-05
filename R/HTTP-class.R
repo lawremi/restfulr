@@ -67,13 +67,13 @@ HTTP <- function(accept = acceptedMediaTypes()) {
 handleResponse <- function(content, reader, cache.info = NULL) {
     response <- list(header = parseHTTPHeader(reader$header()),
                      body = reader$value())
-    if (is(content, "try-error")) {
-        stop(structure(attr(content, "condition"),
-                       body=responseToMedia(response)))
-    }
     status <- as.integer(response$header["status"])
     if (identical(status, HTTP_STATUS$Unauthorized)) {
         unauthorized()
+    }
+    if (is(content, "try-error")) {
+        stop(structure(attr(content, "condition"),
+                       body=responseToMedia(response)))
     }
     if (identical(status, HTTP_STATUS$No_Content)) {
         response <- NULL
