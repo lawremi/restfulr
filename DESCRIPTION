@@ -13,7 +13,7 @@ Imports:
     S4Vectors (>= 0.13.15),
     yaml
 Depends:
-    R (>= 3.3.0),
+    R (>= 3.4.0),
     methods
 Suggests:
     getPass,
