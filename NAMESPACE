@@ -3,7 +3,8 @@ useDynLib(restfulr, .registration = TRUE)
 import(methods)
 importFrom(RCurl, getURLContent, base64, curlOptions, postForm, dynCurlReader,
            getCurlHandle, parseHTTPHeader)
-importFrom(utils, URLencode, URLdecode, read.csv, head, tail, write.csv)
+importFrom(utils, URLencode, URLdecode, read.csv, head, tail, write.csv,
+           download.file)
 importFrom(XML, xmlInternalTreeParse, parseURI, htmlTreeParse)
 importFrom(rjson, fromJSON, toJSON)
 importFrom(S4Vectors, isSingleString, isTRUEorFALSE, recycleArg, unstrsplit)
