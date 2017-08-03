@@ -35,8 +35,7 @@
 % Utilities
 \alias{purgeCache}
 \alias{purgeCache,RestUri-method}
-\alias{download.file}
-\alias{download.file,RestUri-method}
+\alias{embedCredentials}
 
 % Authentication:
 \alias{authenticate}
@@ -144,8 +143,9 @@
 
 \section{Utilities}{
   \describe{
-    \item{}{\code{download.file(url, ...)}: Download the file from
-      \code{url}, a RestUri object. Uses \link{credentials} if available.
+    \item{}{\code{embedCredentials(x)}: Embeds the internal credential
+    information into the URL itself, for interfacing with other tools,
+    like \code{utils::download.file}.
     }
   }
 }
