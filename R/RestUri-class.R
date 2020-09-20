@@ -12,7 +12,8 @@ setClassUnion("CredentialsORNULL", c("Credentials", "NULL"))
 setClass("RestUri",
          representation(cache = "MediaCache",
                         protocol = "CRUDProtocol",
-                        credentials = "CredentialsORNULL"),
+                        credentials = "CredentialsORNULL",
+                        errorHandler = "function"),
          contains = "character")
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26,6 +27,7 @@ globalRestClientCache <- local({
 
 RestUri <- function(base.uri, protocol = CRUDProtocol(base.uri, ...),
                     cache = globalRestClientCache(),
+                    errorHandler = defaultErrorHandler,
                     ...)
 {
   if (!isSingleString(base.uri))
@@ -35,7 +37,7 @@ RestUri <- function(base.uri, protocol = CRUDProtocol(base.uri, ...),
   base.uri <- sub("/$", "", base.uri)
   credentials <- findCredentials(base.uri)
   new("RestUri", base.uri, protocol = protocol, cache = cache,
-      credentials = credentials)
+      credentials = credentials, errorHandler = errorHandler)
 }
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -35,7 +35,7 @@ HTTP <- function(accept = acceptedMediaTypes()) {
                           ...),
                       headerfunction = reader$update)
   content <- try(postForm(x, .opts=opts, curl=curl), silent=TRUE)
-  invisible(handleResponse(content, reader))
+  invisible(handleResponse(content, reader, errorHandler = x@errorHandler))
 })
 
 .HTTP$methods(read = function(x, cache.info, ...) {
@@ -49,7 +49,7 @@ HTTP <- function(accept = acceptedMediaTypes()) {
   curl <- getCurlHandle(httpheader = request.header)
   reader <- dynCurlReader(curl)
   content <- try(getURLContent(x, header = reader, curl = curl), silent=TRUE)
-  handleResponse(content, reader, cache.info)
+  handleResponse(content, reader, cache.info, x@errorHandler)
 })
 
 .HTTP$methods(update = function(x, ..., value) {
@@ -64,7 +64,13 @@ HTTP <- function(accept = acceptedMediaTypes()) {
 ### Helpers
 ###
 
-handleResponse <- function(content, reader, cache.info = NULL) {
+defaultErrorHandler <- function(response, content) {
+  stop(structure(attr(content, "condition"),
+                 body=responseToMedia(response)))
+}
+
+handleResponse <- function(content, reader, cache.info = NULL,
+                           errorHandler = defaultErrorHandler) {
     response <- list(header = parseHTTPHeader(reader$header()),
                      body = reader$value())
     status <- as.integer(response$header["status"])
@@ -72,8 +78,7 @@ handleResponse <- function(content, reader, cache.info = NULL) {
         unauthorized()
     }
     if (is(content, "try-error")) {
-        stop(structure(attr(content, "condition"),
-                       body=responseToMedia(response)))
+      errorHandler(response, content)
     }
     if (identical(status, HTTP_STATUS$No_Content)) {
         response <- NULL
