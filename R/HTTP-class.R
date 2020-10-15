@@ -65,7 +65,7 @@ HTTP <- function(accept = acceptedMediaTypes()) {
 ###
 
 defaultErrorHandler <- function(response) {
-  stop(paste(response$statusMessage))
+  stop(response$statusMessage)
 }
 
 handleResponse <- function(content, reader, cache.info = NULL,
@@ -78,9 +78,8 @@ handleResponse <- function(content, reader, cache.info = NULL,
         unauthorized()
     }
     if (is(content, "try-error")) {
-      body <- response$body
-      body <- as(body, "application/json")
-      body <- as(body, mediaTarget(body))
+      media <- responseToMedia(response)
+      body <- as(media, mediaTarget(media))
       responseError <- list(status = status, statusMessage = statusMessage,
                             body = body)
       errorHandler(responseError)
