@@ -4,19 +4,31 @@
 
 .HTTP <- setRefClass("HTTP",
                      fields = list(
-                       accept = "character"
+                         accept = "character",
+                         cookie = "character_OR_NULL",
+                         insecure = "logical"
                        ),
                      contains = "CRUDProtocol")
+
+setClass("HTTPS", contains="HTTP")
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### Constructor
 ###
 
-HTTP <- function(accept = acceptedMediaTypes()) {
+HTTP <- function(accept = acceptedMediaTypes(), cookie = NULL,
+                 insecure = FALSE)
+{
   if (!is.character(accept) || any(is.na(accept)))
-    stop("'accept' must be a character() without NAs")
-  .HTTP$new(accept = accept)
+      stop("'accept' must be a character() without NAs")
+  if (!is.null(cookie) && !isSingleString(cookie))
+      stop("'cookie' must be a single string or NULL")
+  if (!isTRUEorFALSE(insecure))
+      stop("'insecure' must be a TRUE or FALSE")
+  .HTTP$new(accept = accept, cookie = cookie, insecure = insecure)
 }
+
+HTTPS <- HTTP
 
 ### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ### CRUD implementation
@@ -33,7 +45,11 @@ HTTP <- function(accept = acceptedMediaTypes()) {
                         'Content-Type' = contentType(value),
                         Authorization = authorization(x),
                           ...),
-                      headerfunction = reader$update)
+                      headerfunction = reader$update,
+                      cookie = .self$cookie,
+                      ssl.verifyhost = !.self$insecure,
+                      ssl.verifypeer = !.self$insecure,
+                      followlocation = TRUE)
   content <- try(postForm(x, .opts=opts, curl=curl), silent=TRUE)
   invisible(handleResponse(content, reader, errorHandler = x@errorHandler))
 })
@@ -46,7 +62,10 @@ HTTP <- function(accept = acceptedMediaTypes()) {
                       Accept = accept(.self),
                       ...)
   ## We use our own reader so that we can return the body in case of error
-  curl <- getCurlHandle(httpheader = request.header)
+  curl <- getCurlHandle(httpheader = request.header, cookie = .self$cookie,
+                        ssl.verifyhost = !.self$insecure,
+                        ssl.verifypeer = !.self$insecure,
+                        followlocation = TRUE)
   reader <- dynCurlReader(curl)
   content <- try(getURLContent(x, header = reader, curl = curl), silent=TRUE)
   handleResponse(content, reader, cache.info, x@errorHandler)
