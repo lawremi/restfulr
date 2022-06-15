@@ -21,11 +21,11 @@
 }
 
 \section{Accessors}{
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{username}: get the username as a string.
     }
-    \item{}{
+    \item{
       \code{password}: get the password as a plain text string.
     }
   }

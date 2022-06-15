@@ -92,8 +92,8 @@
 }
 
 \section{Helpers}{
-  \describe{
-    \item{}{\code{mediaCoercionTable()}: Returns a character matrix with
+  \itemize{
+    \item{\code{mediaCoercionTable()}: Returns a character matrix with
       columns \dQuote{from} and \dQuote{to}, indicating the available
       coercions of media types to/from \R objects.
     }

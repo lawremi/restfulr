@@ -61,8 +61,8 @@
   are methods for \code{RestUri} and \code{character} (taken to be a
   URI), described below.
 
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{create(x, value, ..., returnResponse=FALSE)}: Creates a
       resource at \code{x} by converting \code{value} to a supported
       media type. The \dots become query parameters on \code{x}. If
@@ -70,18 +70,18 @@
       response sent from the endpoint. By default, \code{x} is returned,
       to support chaining.  This corresponds to an HTTP \code{POST}.
     }
-    \item{}{
+    \item{
       \code{read(x, ...)}: Reads the resource at \code{x}, coerces it to
       an R object, and returns the object. The \dots become query
       parameters on \code{x}. This corresponds to an HTTP \code{GET}.
     }
-    \item{}{
+    \item{
       \code{update(object, value, ...)}: Updates the resource at \code{x} by
       converting \code{value} to a supported media type. The \dots
       become query parameters on \code{x}. This corresponds to an HTTP
       \code{PUT}.
     }
-    \item{}{
+    \item{
       \code{delete(x, ...)}: Deletes the resource at \code{x}. This
       corresponds to an HTTP \code{DELETE}.
     }
@@ -89,8 +89,8 @@
 }
 
 \section{Constructor}{
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{RestUri(base.uri, protocol = CRUDProtocol(base.uri, ...),
         cache = globalRestClientCache(), ...)}: Constructs a
       \code{RestUri} object, pointing to \code{base.uri}, a string
@@ -100,22 +100,22 @@
       share the same global \code{cache}, a
       \code{\linkS4class{MediaCache}} instance.
     }
-    \item{}{\code{x$name}: Extends the path of \code{x} by appending
+    \item{\code{x$name}: Extends the path of \code{x} by appending
       \code{name}. This is a convenient way to narrow a URI and is
       intuitive if one thinks of a tree of resources as a nested list.
     }
-    \item{}{\code{x[[i]]}: Extends the path of \code{x} by appending
+    \item{\code{x[[i]]}: Extends the path of \code{x} by appending
       \code{i}.
     }
-    \item{}{\code{x[...]}: Named arguments in \code{...} become query
+    \item{\code{x[...]}: Named arguments in \code{...} become query
       parameters on \code{x}.
     }
   }
 }
 
 \section{Container support}{
-  \describe{
-    \item{}{
+  \itemize{
+    \item{
       \code{container(x)}: Gets a \code{\linkS4class{RestContainer}}
       object for treating \code{x} as a list-like container.
     }
@@ -142,8 +142,8 @@
 }
 
 \section{Utilities}{
-  \describe{
-    \item{}{\code{embedCredentials(x)}: Embeds the internal credential
+  \itemize{
+    \item{\code{embedCredentials(x)}: Embeds the internal credential
     information into the URL itself, for interfacing with other tools,
     like \code{utils::download.file}.
     }
