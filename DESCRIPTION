@@ -24,6 +24,7 @@ Collate:
     CacheInfo-class.R
     Credentials-class.R
     HTTP-class.R
+    HTTPS-class.R
     Media-class.R
     MediaCache-class.R
     RestUri-class.R
