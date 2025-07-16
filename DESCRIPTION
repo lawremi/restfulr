@@ -3,7 +3,7 @@ Type: Package
 Title: R Interface to RESTful Web Services
 Version: 0.0.15
 Author: Michael Lawrence
-Maintainer: Michael Lawrence <michafla@gene.com>
+Maintainer: Michael Lawrence <lawremi@gmail.com>
 Description: Models a RESTful service as if it were a nested R list.
 License: Artistic-2.0
 Imports:
