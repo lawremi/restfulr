@@ -6,7 +6,8 @@
                      fields = list(
                          accept = "character",
                          cookie = "character_OR_NULL",
-                         insecure = "logical"
+                         insecure = "logical",
+                         user.agent = "character_OR_NULL"
                        ),
                      contains = "CRUDProtocol")
 
@@ -17,7 +18,7 @@ setClass("HTTPS", contains="HTTP")
 ###
 
 HTTP <- function(accept = acceptedMediaTypes(), cookie = NULL,
-                 insecure = FALSE)
+                 insecure = FALSE, user.agent = NULL)
 {
   if (!is.character(accept) || any(is.na(accept)))
       stop("'accept' must be a character() without NAs")
@@ -25,7 +26,10 @@ HTTP <- function(accept = acceptedMediaTypes(), cookie = NULL,
       stop("'cookie' must be a single string or NULL")
   if (!isTRUEorFALSE(insecure))
       stop("'insecure' must be a TRUE or FALSE")
-  .HTTP$new(accept = accept, cookie = cookie, insecure = insecure)
+  if (!is.null(user.agent) && !isSingleString(user.agent))
+      stop("'user.agent' must be a single string or NULL")
+  .HTTP$new(accept = accept, cookie = cookie, insecure = insecure,
+            user.agent = user.agent)
 }
 
 HTTPS <- HTTP
@@ -44,6 +48,8 @@ HTTPS <- HTTP
                         Accept = accept(.self),
                         'Content-Type' = contentType(value),
                         Authorization = authorization(x),
+                        if (!is.null(.self$user.agent))
+                            c("User-Agent" = .self$user.agent),
                           ...),
                       headerfunction = reader$update,
                       cookie = .self$cookie,
@@ -60,6 +66,8 @@ HTTPS <- HTTP
   request.header <- c(headerFromCacheInfo(cache.info),
                       Authorization = authorization(x),
                       Accept = accept(.self),
+                      if (!is.null(.self$user.agent))
+                          c("User-Agent" = .self$user.agent),
                       ...)
   ## We use our own reader so that we can return the body in case of error
   curl <- getCurlHandle(httpheader = request.header, cookie = .self$cookie,
