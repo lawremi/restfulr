@@ -152,7 +152,9 @@
 
 \examples{
 apache <- RestUri("http://wiki.apache.org")
-read(apache$solr)
+\dontrun{
+    read(apache$solr)
+}
 }
 
 \author{ Michael Lawrence }
