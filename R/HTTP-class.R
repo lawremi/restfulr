@@ -122,7 +122,7 @@ handleResponse <- function(content, reader, cache.info = NULL,
 }
 
 coercionTable <- function() {
-    signatures <- names(getMethods(coerce, table = TRUE))
+    signatures <- names(getMethodsForDispatch(coerce, TRUE))
     matrix(unlist(strsplit(signatures, "#")), ncol=2L, byrow=TRUE,
            dimnames=list(NULL, c("from", "to")))
 }
